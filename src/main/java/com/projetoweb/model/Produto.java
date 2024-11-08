@@ -8,6 +8,11 @@ public class Produto {
 	private Double preco;
 	private Categoria categoria;
 	
+	
+	public Produto() {
+		
+	}
+	
 	public Produto(int id, String nome, String descricao, Double preco, Categoria categoria) {
 		super();
 		Id = id;
@@ -34,6 +39,12 @@ public class Produto {
 	}
 	public void setDescricao(String descricao) {
 		this.descricao = descricao;
+	}
+	public int getQuandidadeEstoque() {
+		return quantidadeEstoque;
+	}
+	public void setQuantidadeEstoque(int quantidadeEstoque) {
+		this.quantidadeEstoque = quantidadeEstoque;
 	}
 	public Double getPreco() {
 		return preco;

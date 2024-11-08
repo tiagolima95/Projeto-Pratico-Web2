@@ -9,6 +9,10 @@ public class Categoria {
 	private String nome;
 	private List<Produto> produtos;
 	
+	public Categoria() {
+		
+	}
+	
 	public Categoria(int id, String nome) {
 		super();
 		this.id = id;
