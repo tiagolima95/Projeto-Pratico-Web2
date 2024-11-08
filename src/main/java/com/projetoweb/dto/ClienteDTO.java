@@ -17,6 +17,21 @@ public class ClienteDTO implements IDTO<Cliente> {
 	 public ClienteDTO(Connection conexao) {
 	        this.conexao = conexao;
 	    }
+	 
+	@Override
+	public void save(Cliente cliente) {
+		String sql = "INSERT INTO cliente (nome, email, telefone) VALUES (?, ?, ?)";
+
+		try (PreparedStatement stmt = conexao.prepareStatement(sql)) {
+		     stmt.setString(1, cliente.getNome());
+		     stmt.setString(2, cliente.getEmail());
+		     stmt.setString(3, cliente.getTelefone());
+		     stmt.executeUpdate();
+		} catch (SQLException e) {
+		     e.printStackTrace();
+		    }
+		}
+		
 
 	@Override
 	public List<Cliente> list(){
@@ -31,6 +46,7 @@ public class ClienteDTO implements IDTO<Cliente> {
 	                cliente.setId(rs.getInt("id"));
 	                cliente.setNome(rs.getString("nome"));
 	                cliente.setEmail(rs.getString("email"));
+	                cliente.setTelefone(rs.getString("telefone"));
 
 	                clientes.add(cliente);
 	            }
@@ -43,21 +59,31 @@ public class ClienteDTO implements IDTO<Cliente> {
 
 	@Override
 	public void update(Cliente cliente) {
-	    String sql = "UPDATE cliente SET nome = ?, email = ? WHERE id = ?";
+	    String sql = "UPDATE cliente SET nome = ?, email = ?, telefone = ? WHERE id = ?";
 
 	    try (Connection conn = ConnectionFactory.getConnection();
 	         PreparedStatement stmt = conn.prepareStatement(sql)) {
 	        stmt.setString(1, cliente.getNome());
 	        stmt.setString(2, cliente.getEmail());
-	        stmt.setInt(3, cliente.getId());
+	        stmt.setString(3, cliente.getTelefone());
+	        stmt.setInt(4, cliente.getId());
 	        stmt.executeUpdate();
 	    } catch (SQLException e) {
 	        e.printStackTrace();
 	    }
 	}
 
+
 	@Override
-	public void save(Cliente cliente) {
-		// TODO Auto-generated method stub
+	public void delete(int id){
+		
+		String sql = "DELETE FROM cliente WHERE id = ?";
+
+	    try (PreparedStatement stmt = conexao.prepareStatement(sql)) {
+	        stmt.setInt(1, id);
+	        stmt.executeUpdate();
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
 	}
 }

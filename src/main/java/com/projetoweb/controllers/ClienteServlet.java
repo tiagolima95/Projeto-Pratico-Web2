@@ -2,7 +2,6 @@ package com.projetoweb.controllers;
 
 import com.projetoweb.dto.ClienteDTO;
 import com.projetoweb.model.Cliente;
-import com.projetoweb.model.Usuario;
 import com.projetoweb.utils.ConnectionFactory;
 
 import jakarta.servlet.ServletException;
@@ -33,5 +32,27 @@ public class ClienteServlet extends HttpServlet {
             e.printStackTrace();
             throw new ServletException("Erro ao conectar ao banco de dados", e);
         }
+    }
+    
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String nome = request.getParameter("nome");
+        String email = request.getParameter("email");
+        String telefone = request.getParameter("telefone");
+
+        Cliente cliente = new Cliente();
+        cliente.setNome(nome);
+        cliente.setEmail(email);
+        cliente.setTelefone(telefone);
+
+        try (Connection conexao = ConnectionFactory.getConnection()) {
+            ClienteDTO clienteDTO = new ClienteDTO(conexao);
+            clienteDTO.save(cliente); 
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new ServletException("Erro ao salvar cliente", e);
+        }
+
+        response.sendRedirect(request.getContextPath() + "/clientes");
     }
 }
