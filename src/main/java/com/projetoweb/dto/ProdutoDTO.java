@@ -133,17 +133,48 @@ public class ProdutoDTO implements IDTO<Produto>{
 	}
 
 	@Override
-	public void update(Produto obj) {
-		// TODO Auto-generated method stub
-		
+	public void update(Produto produto) {
+	    String sql = "UPDATE produto SET nome = ?, descricao = ?, quantidade_estoque = ?, preco = ?, categoria_id = ? WHERE id = ?";
+
+	    try (PreparedStatement stmt = conexao.prepareStatement(sql)) {
+	        stmt.setString(1, produto.getNome());
+	        stmt.setString(2, produto.getDescricao());
+	        stmt.setInt(3, produto.getQuantidadeEstoque());
+	        stmt.setDouble(4, produto.getPreco());
+	        stmt.setInt(5, produto.getCategoria().getId());
+	        stmt.setInt(6, produto.getId());
+
+	        int linhasAfetadas = stmt.executeUpdate();
+
+	        if (linhasAfetadas > 0) {
+	            System.out.println("Produto atualizado com sucesso.");
+	        } else {
+	            System.out.println("Nenhum produto foi encontrado para atualizar.");
+	        }
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
 	}
 	
 	
 
 	@Override
 	public void delete(int id) {
-		// TODO Auto-generated method stub
-		
+	    String sql = "DELETE FROM produto WHERE id = ?";
+
+	    try (PreparedStatement stmt = conexao.prepareStatement(sql)) {
+	        stmt.setInt(1, id);
+
+	        int linhasAfetadas = stmt.executeUpdate();
+
+	        if (linhasAfetadas > 0) {
+	            System.out.println("Produto excluído com sucesso.");
+	        } else {
+	            System.out.println("Nenhum produto foi encontrado para excluir.");
+	        }
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
 	}
 	
 	public List<Produto> listPaginado(int pagina, int itensPorPagina) {

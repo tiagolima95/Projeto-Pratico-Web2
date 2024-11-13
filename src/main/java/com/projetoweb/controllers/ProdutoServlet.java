@@ -1,5 +1,6 @@
 package com.projetoweb.controllers;
 
+import com.projetoweb.dto.CategoriaDTO;
 import com.projetoweb.dto.ProdutoDTO;
 import com.projetoweb.model.Categoria;
 import com.projetoweb.model.Produto;
@@ -19,28 +20,33 @@ import java.util.List;
 @WebServlet("/produtos")
 public class ProdutoServlet extends HttpServlet {
 
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        int pagina = request.getParameter("pagina") != null ? Integer.parseInt(request.getParameter("pagina")) : 1;
-        int itensPorPagina = 5;
+	@Override
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	    // Paginando os produtos
+	    int pagina = request.getParameter("pagina") != null ? Integer.parseInt(request.getParameter("pagina")) : 1;
+	    int itensPorPagina = 5;
 
-        try (Connection conexao = ConnectionFactory.getConnection()) {
-            ProdutoDTO produtoDTO = new ProdutoDTO(conexao);
+	    try (Connection conexao = ConnectionFactory.getConnection()) {
+	        ProdutoDTO produtoDTO = new ProdutoDTO(conexao);
 
-            List<Produto> produtos = produtoDTO.listPaginado(pagina, itensPorPagina);
-            int totalProdutos = produtoDTO.count();
-            int totalPaginas = (int) Math.ceil((double) totalProdutos / itensPorPagina);
+	        List<Produto> produtos = produtoDTO.listPaginado(pagina, itensPorPagina);
+	        int totalProdutos = produtoDTO.count();
+	        int totalPaginas = (int) Math.ceil((double) totalProdutos / itensPorPagina);
 
-            request.setAttribute("produtos", produtos);
-            request.setAttribute("paginaAtual", pagina);
-            request.setAttribute("totalPaginas", totalPaginas);
+	        CategoriaDTO categoriaDTO = new CategoriaDTO(conexao);
+	        List<Categoria> categorias = categoriaDTO.list();
 
-            request.getRequestDispatcher("/WEB-INF/views/produto.jsp").forward(request, response);
-        } catch (SQLException e) {
-            e.printStackTrace();
-            throw new ServletException("Erro ao conectar ao banco de dados", e);
-        }
-    }
+	        request.setAttribute("produtos", produtos);
+	        request.setAttribute("paginaAtual", pagina);
+	        request.setAttribute("totalPaginas", totalPaginas);
+	        request.setAttribute("categorias", categorias); // Passando as categorias para a JSP
+
+	        request.getRequestDispatcher("/WEB-INF/views/produto.jsp").forward(request, response);
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	        throw new ServletException("Erro ao conectar ao banco de dados", e);
+	    }
+	}
     
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -48,8 +54,7 @@ public class ProdutoServlet extends HttpServlet {
         String descricao = request.getParameter("descricao");
         int quantidadeEstoque = Integer.parseInt(request.getParameter("quantidade_estoque"));
         double preco = Double.parseDouble(request.getParameter("preco"));
-        int categoriaId = Integer.parseInt(request.getParameter("categoriaId")); // Corrigido para categoriaId
-
+        int categoriaId = Integer.parseInt(request.getParameter("categoriaId")); 
         Produto produto = new Produto();
         produto.setNome(nome);
         produto.setDescricao(descricao);
