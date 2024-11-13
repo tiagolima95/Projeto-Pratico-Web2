@@ -40,7 +40,7 @@ public class Produto {
 	public void setDescricao(String descricao) {
 		this.descricao = descricao;
 	}
-	public int getQuandidadeEstoque() {
+	public int getQuantidadeEstoque() {
 		return quantidadeEstoque;
 	}
 	public void setQuantidadeEstoque(int quantidadeEstoque) {
@@ -57,6 +57,11 @@ public class Produto {
 	}
 	public void setCategoria(Categoria categoria) {
 		this.categoria = categoria;
+	}
+	
+	@Override
+	public String toString() {
+	    return "Produto " + nome;
 	}
 	
 }

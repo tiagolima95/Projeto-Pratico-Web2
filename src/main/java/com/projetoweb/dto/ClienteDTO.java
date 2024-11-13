@@ -56,6 +56,30 @@ public class ClienteDTO implements IDTO<Cliente> {
 
 	        return clientes;		
 	}
+	
+	public Cliente findById(int id) {
+	    String sql = "SELECT * FROM cliente WHERE id = ?";
+	    Cliente cliente = null;
+
+	    try (PreparedStatement stmt = conexao.prepareStatement(sql)) {
+	        stmt.setInt(1, id);
+	        try (ResultSet rs = stmt.executeQuery()) {
+	            if (rs.next()) {
+	                cliente = new Cliente();
+	                cliente.setId(rs.getInt("id"));
+	                cliente.setNome(rs.getString("nome"));
+	                cliente.setEmail(rs.getString("email"));
+	                cliente.setTelefone(rs.getString("telefone"));
+	            }
+	        }
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+
+	    return cliente;
+	}
+	
+	
 
 	@Override
 	public void update(Cliente cliente) {
@@ -72,6 +96,8 @@ public class ClienteDTO implements IDTO<Cliente> {
 	        e.printStackTrace();
 	    }
 	}
+	
+	
 
 
 	@Override

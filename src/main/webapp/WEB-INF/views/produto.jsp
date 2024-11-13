@@ -3,26 +3,26 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Lista de Clientes</title>
+    <title>Produtos</title>
 </head>
 <body>
-	 <h1>Lista de Clientes</h1>
+	 <h1>Produtos</h1>
     <ul>
-        <c:forEach var="cliente" items="${clientes}">
-            <li>Nome: ${cliente.nome} - E-mail: ${cliente.email} - Telefone: ${cliente.telefone}</li>
+        <c:forEach var="produto" items="${produtos}">
+            <li>Nome: ${produto.nome} - Descrição: ${produto.descricao} - Preço: R$ ${produto.preco}</li>
         </c:forEach>
     </ul>
 
-    <h1>Adicionar Novo Cliente</h1>
-    <form action="${pageContext.request.contextPath}/clientes" method="post">
+    <h1>Adicionar Novo Produto</h1>
+    <form action="${pageContext.request.contextPath}/produtos" method="post">
         <label for="nome">Nome:</label>
         <input type="text" id="nome" name="nome" required><br><br>
 
-        <label for="email">E-mail:</label>
-        <input type="email" id="email" name="email" required><br><br>
+        <label for="descricao">Descrição:</label>
+        <input type="descricao" id="descricao" name="descricao" required><br><br>
 
-        <label for="telefone">Telefone:</label>
-        <input type="text" id="telefone" name="telefone" required><br><br>
+        <label for="preco">Preço:</label>
+        <input type="preco" id="preco" name="preco" required><br><br>
 
         <input type="submit" value="Adicionar Cliente">
     </form>
