@@ -121,7 +121,7 @@
     </style>
 </head>
 <body>
-    <div class="container">
+     <div class="container">
         <h1>Lista de Clientes</h1>
 
         <!-- Tabela de clientes -->
@@ -141,10 +141,12 @@
                         <td>${cliente.email}</td>
                         <td>${cliente.telefone}</td>
                         <td>
-                            <a href="${pageContext.request.contextPath}/clientes/editar?id=${cliente.id}" class="btn btn-alterar">Alterar</a>
+                            <a href="${pageContext.request.contextPath}/clientes?id=${cliente.id}" class="btn btn-alterar">Alterar</a>
                             
-                            <form action="${pageContext.request.contextPath}/clientes/excluir" method="post" style="display: inline;" onsubmit="return confirm('Tem certeza que deseja excluir este cliente?');">
-                                <input type="hidden" name="clienteId" value="${cliente.id}">
+                            <form action="${pageContext.request.contextPath}/clientes" method="post" style="display: inline;" 
+                                  onsubmit="return confirm('Tem certeza que deseja excluir este cliente?');">
+                                <input type="hidden" name="action" value="excluir">
+                                <input type="hidden" name="id" value="${cliente.id}">
                                 <button type="submit" class="btn btn-excluir">Excluir</button>
                             </form>
                         </td>
