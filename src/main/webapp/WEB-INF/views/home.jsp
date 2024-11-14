@@ -60,7 +60,6 @@
         <p><a href="realizarVenda">Registrar Venda</a></p>
         <p><a href="produtos">Gerenciar Produtos</a></p>
         <p><a href="clientes">Gerenciar Clientes</a></p>
-        <p><a href="vendasRealizadas">Vendas Realizadas</a></p>
     </div>
 </body>
 </html>

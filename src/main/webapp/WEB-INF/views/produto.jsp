@@ -118,6 +118,34 @@ input[type="submit"] {
 input[type="submit"]:hover {
 	background-color: #218838;
 }
+
+        nav ul {
+            list-style-type: none;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        nav ul li a {
+            color: #007bff;
+            text-decoration: none;
+            padding: 8px 12px;
+            border: 1px solid #007bff;
+            border-radius: 4px;
+            font-size: 16px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        nav ul li a:hover {
+            background-color: #007bff;
+            color: #fff;
+        }
+
+        .client-info {
+            margin: 20px 0;
+            text-align: left;
+        }
 </style>
 </head>
 <body>
@@ -155,6 +183,14 @@ input[type="submit"]:hover {
 				</c:forEach>
 			</tbody>
 		</table>
+		
+		 <nav>
+                <ul>
+                    <c:forEach var="i" begin="1" end="${totalPaginas}">
+                        <li><a href="?pagina=${i}">${i}</a></li>
+                    </c:forEach>
+                </ul>
+            </nav>
 
 		<h1>Adicionar Novo Produto</h1>
 		<form action="${pageContext.request.contextPath}/produtos"

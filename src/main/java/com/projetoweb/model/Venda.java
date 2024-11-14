@@ -84,5 +84,10 @@ public class Venda {
         this.itens.remove(item);
         this.valorTotal = calcularValorTotal();
     }
+    
+
+    public String ToString(){
+    	return id +", " + cliente;
+    }
 
 }

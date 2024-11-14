@@ -20,37 +20,36 @@ public class VendaDTO implements IDTO<Venda> {
 
     @Override
     public void save(Venda venda) {
-        String sqlVenda = "INSERT INTO venda (data, cliente_id) VALUES (?, ?)";  // Removendo valor_total
+        String sqlVenda = "INSERT INTO venda (data, cliente_id) VALUES (?, ?)";  
         String sqlItemVenda = "INSERT INTO item_venda (venda_id, produto_id, quantidade, preco_unitario, valor_total) VALUES (?, ?, ?, ?, ?)";
         
         try (PreparedStatement stmtVenda = conexao.prepareStatement(sqlVenda, Statement.RETURN_GENERATED_KEYS)) {
-            stmtVenda.setTimestamp(1, new java.sql.Timestamp(venda.getData().getTime()));  // Usando Timestamp para incluir hora
-            stmtVenda.setInt(2, venda.getCliente().getId());  // Definindo o ID do cliente
+            stmtVenda.setTimestamp(1, new java.sql.Timestamp(venda.getData().getTime()));  
+            stmtVenda.setInt(2, venda.getCliente().getId());  
 
             stmtVenda.executeUpdate();
 
             try (ResultSet generatedKeys = stmtVenda.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
-                    venda.setId(generatedKeys.getInt(1));  // Definindo o ID da venda após o insert
+                    venda.setId(generatedKeys.getInt(1));  
                 }
             }
 
             // Inserindo os itens da venda
             for (ItemVenda item : venda.getItens()) {
                 try (PreparedStatement stmtItem = conexao.prepareStatement(sqlItemVenda)) {
-                    stmtItem.setInt(1, venda.getId());  // A venda já tem um ID agora
+                    stmtItem.setInt(1, venda.getId());  
                     stmtItem.setInt(2, item.getProduto().getId());
                     stmtItem.setInt(3, item.getQuantidade());
                     stmtItem.setDouble(4, item.getPrecoUnitario());
                     stmtItem.setDouble(5, item.getValorTotal());
 
                     stmtItem.executeUpdate();
-                    
-                    // Atualizar o estoque do produto (se necessário)
+
                     ProdutoDTO produtoDTO = new ProdutoDTO(conexao);
                     Produto produto = item.getProduto();
-                    produto.setQuantidadeEstoque(produto.getQuantidadeEstoque() - item.getQuantidade()); // Atualizando o estoque
-                    produtoDTO.update(produto);  // Atualizando o produto no banco
+                    produto.setQuantidadeEstoque(produto.getQuantidadeEstoque() - item.getQuantidade());
+                    produtoDTO.update(produto);  
                 }
             }
         } catch (SQLException e) {
@@ -62,14 +61,9 @@ public class VendaDTO implements IDTO<Venda> {
     @Override
     public List<Venda> list() {
         List<Venda> vendas = new ArrayList<>();
-        String sqlVenda = "SELECT v.id, v.data, v.cliente_id, v.valor_total, c.nome AS cliente_nome, c.email AS cliente_email, c.telefone AS cliente_telefone " +
+        String sqlVenda = "SELECT v.id, v.data, v.cliente_id " +
                           "FROM venda v " +
                           "INNER JOIN cliente c ON v.cliente_id = c.id";
-
-        String sqlItens = "SELECT iv.quantidade, iv.preco_unitario, iv.valor_total, p.id AS produto_id, p.nome AS produto_nome " +
-                           "FROM item_venda iv " +
-                           "INNER JOIN produto p ON iv.produto_id = p.id " +
-                           "WHERE iv.venda_id = ?";
 
         try (PreparedStatement stmtVenda = conexao.prepareStatement(sqlVenda);
              ResultSet rsVenda = stmtVenda.executeQuery()) {
@@ -77,40 +71,15 @@ public class VendaDTO implements IDTO<Venda> {
             while (rsVenda.next()) {
                 Venda venda = new Venda();
                 venda.setId(rsVenda.getInt("id"));
-                venda.setData(rsVenda.getDate("data"));
-                venda.setValorTotal(rsVenda.getDouble("valor_total"));
+                venda.setData(rsVenda.getTimestamp("data"));
 
-                // Carregar o cliente da venda
                 Cliente cliente = new Cliente();
                 cliente.setId(rsVenda.getInt("cliente_id"));
-                cliente.setNome(rsVenda.getString("cliente_nome"));
-                cliente.setEmail(rsVenda.getString("cliente_email"));
-                cliente.setTelefone(rsVenda.getString("cliente_telefone"));
                 venda.setCliente(cliente);
 
-                // Carregar os itens da venda
-                List<ItemVenda> itens = new ArrayList<>();
-                try (PreparedStatement stmtItens = conexao.prepareStatement(sqlItens)) {
-                    stmtItens.setInt(1, venda.getId());
-                    try (ResultSet rsItens = stmtItens.executeQuery()) {
-                        while (rsItens.next()) {
-                            ItemVenda item = new ItemVenda();
-                            item.setQuantidade(rsItens.getInt("quantidade"));
-                            item.setPrecoUnitario(rsItens.getDouble("preco_unitario"));
-                            item.setValorTotal(rsItens.getDouble("valor_total"));
-
-                            Produto produto = new Produto();
-                            produto.setId(rsItens.getInt("produto_id"));
-                            produto.setNome(rsItens.getString("produto_nome"));
-                            item.setProduto(produto);
-
-                            itens.add(item);
-                        }
-                    }
-                }
-
-                venda.setItens(itens);
                 vendas.add(venda);
+                
+                System.out.print(vendas);
             }
         } catch (SQLException e) {
             e.printStackTrace();

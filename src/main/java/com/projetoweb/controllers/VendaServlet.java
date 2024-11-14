@@ -32,18 +32,20 @@ public class VendaServlet extends HttpServlet {
 
 		try (Connection conexao = ConnectionFactory.getConnection()) {
 			ProdutoDTO produtoDTO = new ProdutoDTO(conexao);
+			ClienteDTO clienteDTO = new ClienteDTO(conexao);
+			
 			List<Produto> produtos = produtoDTO.listPaginado(paginaAtual, itensPorPagina);
+			List<Cliente> clientes = clienteDTO.list();
 			int totalProdutos = produtoDTO.count();
 			int totalPaginas = (int) Math.ceil((double) totalProdutos / itensPorPagina);
 			
 			VendaDTO vendaDTO = new VendaDTO(conexao);
 	        List<Venda> vendas = vendaDTO.list();
 
-			request.setAttribute("vendas", vendas);
+			request.setAttribute("clientes", clientes);
+	        request.setAttribute("vendas", vendas);
 	        request.setAttribute("produtos", produtos);
 			request.setAttribute("totalPaginas", totalPaginas);
-
-			System.out.println("Produtos: " + produtos);
 
 			request.getRequestDispatcher("/WEB-INF/views/venda.jsp").forward(request, response);
 		} catch (Exception e) {
@@ -109,8 +111,9 @@ public class VendaServlet extends HttpServlet {
 
 	        VendaDTO vendaDTO = new VendaDTO(conexao);
 	        vendaDTO.save(venda);
+        
 
-	        request.getRequestDispatcher("/WEB-INF/views/listaVendas.jsp").forward(request, response);
+	        request.getRequestDispatcher("/WEB-INF/views/home.jsp").forward(request, response);
 	    } catch (Exception e) {
 	        e.printStackTrace();
 	        response.sendRedirect("erro.jsp");
