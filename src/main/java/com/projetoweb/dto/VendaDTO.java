@@ -62,8 +62,14 @@ public class VendaDTO implements IDTO<Venda> {
     @Override
     public List<Venda> list() {
         List<Venda> vendas = new ArrayList<>();
-        String sqlVenda = "SELECT * FROM venda";
-        String sqlItens = "SELECT * FROM item_venda WHERE venda_id = ?";
+        String sqlVenda = "SELECT v.id, v.data, v.cliente_id, v.valor_total, c.nome AS cliente_nome, c.email AS cliente_email, c.telefone AS cliente_telefone " +
+                          "FROM venda v " +
+                          "INNER JOIN cliente c ON v.cliente_id = c.id";
+
+        String sqlItens = "SELECT iv.quantidade, iv.preco_unitario, iv.valor_total, p.id AS produto_id, p.nome AS produto_nome " +
+                           "FROM item_venda iv " +
+                           "INNER JOIN produto p ON iv.produto_id = p.id " +
+                           "WHERE iv.venda_id = ?";
 
         try (PreparedStatement stmtVenda = conexao.prepareStatement(sqlVenda);
              ResultSet rsVenda = stmtVenda.executeQuery()) {
@@ -74,15 +80,18 @@ public class VendaDTO implements IDTO<Venda> {
                 venda.setData(rsVenda.getDate("data"));
                 venda.setValorTotal(rsVenda.getDouble("valor_total"));
 
-                int clienteId = rsVenda.getInt("cliente_id");
-                ClienteDTO clienteDTO = new ClienteDTO(conexao);
-                Cliente cliente = clienteDTO.findById(clienteId);
+                // Carregar o cliente da venda
+                Cliente cliente = new Cliente();
+                cliente.setId(rsVenda.getInt("cliente_id"));
+                cliente.setNome(rsVenda.getString("cliente_nome"));
+                cliente.setEmail(rsVenda.getString("cliente_email"));
+                cliente.setTelefone(rsVenda.getString("cliente_telefone"));
                 venda.setCliente(cliente);
 
+                // Carregar os itens da venda
                 List<ItemVenda> itens = new ArrayList<>();
                 try (PreparedStatement stmtItens = conexao.prepareStatement(sqlItens)) {
                     stmtItens.setInt(1, venda.getId());
-
                     try (ResultSet rsItens = stmtItens.executeQuery()) {
                         while (rsItens.next()) {
                             ItemVenda item = new ItemVenda();
@@ -90,15 +99,16 @@ public class VendaDTO implements IDTO<Venda> {
                             item.setPrecoUnitario(rsItens.getDouble("preco_unitario"));
                             item.setValorTotal(rsItens.getDouble("valor_total"));
 
-                            int produtoId = rsItens.getInt("produto_id");
-                            ProdutoDTO produtoDTO = new ProdutoDTO(conexao);
-                            Produto produto = produtoDTO.findById(produtoId);
+                            Produto produto = new Produto();
+                            produto.setId(rsItens.getInt("produto_id"));
+                            produto.setNome(rsItens.getString("produto_nome"));
                             item.setProduto(produto);
 
                             itens.add(item);
                         }
                     }
                 }
+
                 venda.setItens(itens);
                 vendas.add(venda);
             }

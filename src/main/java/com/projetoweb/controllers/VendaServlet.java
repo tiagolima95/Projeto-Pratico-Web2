@@ -35,8 +35,12 @@ public class VendaServlet extends HttpServlet {
 			List<Produto> produtos = produtoDTO.listPaginado(paginaAtual, itensPorPagina);
 			int totalProdutos = produtoDTO.count();
 			int totalPaginas = (int) Math.ceil((double) totalProdutos / itensPorPagina);
+			
+			VendaDTO vendaDTO = new VendaDTO(conexao);
+	        List<Venda> vendas = vendaDTO.list();
 
-			request.setAttribute("produtos", produtos);
+			request.setAttribute("vendas", vendas);
+	        request.setAttribute("produtos", produtos);
 			request.setAttribute("totalPaginas", totalPaginas);
 
 			System.out.println("Produtos: " + produtos);
@@ -92,7 +96,6 @@ public class VendaServlet extends HttpServlet {
 	            return; 
 	        }
 
-
 	        double valorTotal = 0;
 	        for (ItemVenda item : itensVenda) {
 	            valorTotal += item.getValorTotal();
@@ -107,7 +110,7 @@ public class VendaServlet extends HttpServlet {
 	        VendaDTO vendaDTO = new VendaDTO(conexao);
 	        vendaDTO.save(venda);
 
-	        request.getRequestDispatcher("/WEB-INF/views/cliente.jsp").forward(request, response);
+	        request.getRequestDispatcher("/WEB-INF/views/listaVendas.jsp").forward(request, response);
 	    } catch (Exception e) {
 	        e.printStackTrace();
 	        response.sendRedirect("erro.jsp");

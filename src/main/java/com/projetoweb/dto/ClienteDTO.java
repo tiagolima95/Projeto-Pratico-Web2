@@ -30,8 +30,7 @@ public class ClienteDTO implements IDTO<Cliente> {
 		} catch (SQLException e) {
 		     e.printStackTrace();
 		    }
-		}
-		
+		}		
 
 	@Override
 	public List<Cliente> list(){
@@ -75,11 +74,8 @@ public class ClienteDTO implements IDTO<Cliente> {
 	    } catch (SQLException e) {
 	        e.printStackTrace();
 	    }
-
 	    return cliente;
-	}
-	
-	
+	}	
 
 	@Override
 	public void update(Cliente cliente) {
@@ -96,9 +92,6 @@ public class ClienteDTO implements IDTO<Cliente> {
 	        e.printStackTrace();
 	    }
 	}
-	
-	
-
 
 	@Override
 	public void delete(int id){

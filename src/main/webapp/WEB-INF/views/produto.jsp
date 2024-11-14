@@ -124,7 +124,6 @@ input[type="submit"]:hover {
 	<div class="container">
 		<h1>Produtos</h1>
 
-		<!-- Tabela de produtos -->
 		<table>
 			<thead>
 				<tr>
@@ -142,14 +141,13 @@ input[type="submit"]:hover {
 						<td>${produto.descricao}</td>
 						<td>R$ ${produto.preco}</td>
 						<td>${produto.quantidadeEstoque}</td>
-						<td>
-							<!-- Link para editar o produto --> <a
-							href="${pageContext.request.contextPath}/produtos?id=${produto.id}"
-							class="btn btn-alterar">Alterar</a> <!-- Formulário para excluir o produto -->
-							<form action="${pageContext.request.contextPath}/excluirProduto"
-								method="post" style="display: inline;"
+						<td><a
+							href="${pageContext.request.contextPath}/produtos?id=${produto.id}" class="btn btn-alterar">Alterar</a> 
+							
+							<form action="${pageContext.request.contextPath}/produtos"	method="post" style="display: inline;"
 								onsubmit="return confirm('Tem certeza que deseja excluir este produto?');">
-								<input type="hidden" name="produtoId" value="${produto.id}">
+								<input type="hidden" name="action" value="excluir"> 
+								<input	type="hidden" name="id" value="${produto.id}">
 								<button type="submit" class="btn btn-excluir">Excluir</button>
 							</form>
 						</td>
@@ -161,22 +159,28 @@ input[type="submit"]:hover {
 		<h1>Adicionar Novo Produto</h1>
 		<form action="${pageContext.request.contextPath}/produtos"
 			method="post">
-			<label for="nome">Nome:</label> <input type="text" id="nome"
-				name="nome" required> <label for="descricao">Descrição:</label>
+			<label for="nome">Nome:</label> 
+			<input type="text" id="nome" name="nome" required> 
+			
+			<label for="descricao">Descrição:</label>
 			<input type="text" id="descricao" name="descricao" required>
 
-			<label for="preco">Preço:</label> <input type="number" id="preco"
-				name="preco" step="0.01" required> <label
-				for="quantidadeEstoque">Quantidade:</label> <input type="number"
-				id="quantidadeEstoque" name="quantidade" required>
-
-			<label for="categoria">Categoria:</label> <select id="categoria"
-				name="categoria" required>
-				<option value="">Selecione a Categoria</option>
+			<label for="preco">Preço:</label> 
+			<input type="number" id="preco" name="preco" step="0.01" required> 
+			
+			<label for="quantidadeEstoque">Quantidade:</label> 
+			<input type="number" name="quantidade_estoque" id="quantidade_estoque" value="${produto.quantidadeEstoque}" required /> 
+				
+			<label for="categoriaId">Categoria:</label> 
+			<select name="categoriaId"
+				id="categoriaId" required>
 				<c:forEach var="categoria" items="${categorias}">
-					<option value="${categoria.id}">${categoria.nome}</option>
+					<option value="${categoria.id}"
+						${categoria.id == produto.categoria.id ? 'selected' : ''}>
+						${categoria.nome}</option>
 				</c:forEach>
-			</select> <input type="submit" value="Adicionar Produto">
+			</select> 
+			<input type="submit" value="Adicionar Produto">
 		</form>
 	</div>
 </body>

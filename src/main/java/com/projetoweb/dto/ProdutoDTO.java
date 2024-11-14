@@ -77,7 +77,6 @@ public class ProdutoDTO implements IDTO<Produto>{
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
         return produtos;	
 	}
 	
@@ -97,7 +96,6 @@ public class ProdutoDTO implements IDTO<Produto>{
 	                produto.setQuantidadeEstoque(rs.getInt("quantidade_estoque"));
 	                produto.setPreco(rs.getDouble("preco"));
 
-	                // Carregar a categoria associada
 	                int categoriaId = rs.getInt("categoria_id");
 	                Categoria categoria = findCategoriaById(categoriaId);
 	                produto.setCategoria(categoria);
@@ -106,11 +104,9 @@ public class ProdutoDTO implements IDTO<Produto>{
 	    } catch (SQLException e) {
 	        e.printStackTrace();
 	    }
-
 	    return produto;
 	}
 
-	// Método auxiliar para buscar a categoria pelo ID
 	private Categoria findCategoriaById(int categoriaId) {
 	    String categoriaSql = "SELECT * FROM categoria WHERE id = ?";
 	    Categoria categoria = null;
@@ -128,7 +124,6 @@ public class ProdutoDTO implements IDTO<Produto>{
 	    } catch (SQLException e) {
 	        e.printStackTrace();
 	    }
-
 	    return categoria;
 	}
 
@@ -154,9 +149,7 @@ public class ProdutoDTO implements IDTO<Produto>{
 	    } catch (SQLException e) {
 	        e.printStackTrace();
 	    }
-	}
-	
-	
+	}	
 
 	@Override
 	public void delete(int id) {
@@ -182,8 +175,8 @@ public class ProdutoDTO implements IDTO<Produto>{
 	    String sql = "SELECT * FROM produto LIMIT ? OFFSET ?";
 
 	    try (PreparedStatement stmt = conexao.prepareStatement(sql)) {
-	        stmt.setInt(1, itensPorPagina); // Define o limite de itens por página
-	        stmt.setInt(2, (pagina - 1) * itensPorPagina); // Define o offset
+	        stmt.setInt(1, itensPorPagina); 
+	        stmt.setInt(2, (pagina - 1) * itensPorPagina); 
 
 	        try (ResultSet rs = stmt.executeQuery()) {
 	            while (rs.next()) {
@@ -204,7 +197,6 @@ public class ProdutoDTO implements IDTO<Produto>{
 	    } catch (SQLException e) {
 	        e.printStackTrace();
 	    }
-
 	    return produtos;
 	}
 
@@ -220,17 +212,15 @@ public class ProdutoDTO implements IDTO<Produto>{
 	    } catch (SQLException e) {
 	        e.printStackTrace();
 	    }
-
 	    return total;
 	}
 	
 	 public void updateEstoque(Produto produto) throws SQLException {
 	        String sql = "UPDATE produto SET quantidade_estoque = ? WHERE id = ?";
 	        try (PreparedStatement stmt = conexao.prepareStatement(sql)) {
-	            stmt.setInt(1, produto.getQuantidadeEstoque());  // Atualiza o estoque
-	            stmt.setInt(2, produto.getId());  // Identifica o produto pelo ID
+	            stmt.setInt(1, produto.getQuantidadeEstoque()); 
+	            stmt.setInt(2, produto.getId());
 	            stmt.executeUpdate();
 	        }
 	    }
-
 }

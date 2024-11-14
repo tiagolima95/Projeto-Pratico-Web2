@@ -22,13 +22,28 @@ public class ProdutoServlet extends HttpServlet {
 
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-	    // Paginando os produtos
 	    int pagina = request.getParameter("pagina") != null ? Integer.parseInt(request.getParameter("pagina")) : 1;
 	    int itensPorPagina = 5;
-
+	    
+	    String idParam = request.getParameter("id");
+	    
 	    try (Connection conexao = ConnectionFactory.getConnection()) {
 	        ProdutoDTO produtoDTO = new ProdutoDTO(conexao);
 
+	        if (idParam != null) { 
+	            int id = Integer.parseInt(idParam);
+	            Produto produto = produtoDTO.findById(id);
+
+	            if (produto != null) {
+	                CategoriaDTO categoriaDTO = new CategoriaDTO(conexao);
+	                List<Categoria> categorias = categoriaDTO.list();
+	                request.setAttribute("produto", produto);
+	                request.setAttribute("categorias", categorias);
+	                request.getRequestDispatcher("/WEB-INF/views/editarProduto.jsp").forward(request, response);
+	                return;
+	            }
+	        }
+	        
 	        List<Produto> produtos = produtoDTO.listPaginado(pagina, itensPorPagina);
 	        int totalProdutos = produtoDTO.count();
 	        int totalPaginas = (int) Math.ceil((double) totalProdutos / itensPorPagina);
@@ -39,8 +54,7 @@ public class ProdutoServlet extends HttpServlet {
 	        request.setAttribute("produtos", produtos);
 	        request.setAttribute("paginaAtual", pagina);
 	        request.setAttribute("totalPaginas", totalPaginas);
-	        request.setAttribute("categorias", categorias); // Passando as categorias para a JSP
-
+	        request.setAttribute("categorias", categorias);
 	        request.getRequestDispatcher("/WEB-INF/views/produto.jsp").forward(request, response);
 	    } catch (SQLException e) {
 	        e.printStackTrace();
@@ -48,32 +62,48 @@ public class ProdutoServlet extends HttpServlet {
 	    }
 	}
     
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String nome = request.getParameter("nome");
-        String descricao = request.getParameter("descricao");
-        int quantidadeEstoque = Integer.parseInt(request.getParameter("quantidade_estoque"));
-        double preco = Double.parseDouble(request.getParameter("preco"));
-        int categoriaId = Integer.parseInt(request.getParameter("categoriaId")); 
-        Produto produto = new Produto();
-        produto.setNome(nome);
-        produto.setDescricao(descricao);
-        produto.setQuantidadeEstoque(quantidadeEstoque);
-        produto.setPreco(preco);
+	@Override
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	    String action = request.getParameter("action"); 
+	    String idParam = request.getParameter("id");
 
-        // Configurando a categoria do produto
-        Categoria categoria = new Categoria();
-        categoria.setId(categoriaId);
-        produto.setCategoria(categoria);
+	    try (Connection conexao = ConnectionFactory.getConnection()) {
+	        ProdutoDTO produtoDTO = new ProdutoDTO(conexao);
+	        
+	        if ("excluir".equals(action)) {
+	            if (idParam != null && !idParam.isEmpty()) {
+	                int produtoId = Integer.parseInt(idParam);
+	                produtoDTO.delete(produtoId); 
+	            }
+	        } else {
+	            String nome = request.getParameter("nome");
+	            String descricao = request.getParameter("descricao");
+	            int quantidadeEstoque = Integer.parseInt(request.getParameter("quantidade_estoque"));
+	            double preco = Double.parseDouble(request.getParameter("preco"));
+	            int categoriaId = Integer.parseInt(request.getParameter("categoriaId"));
 
-        try (Connection conexao = ConnectionFactory.getConnection()) {
-            ProdutoDTO produtoDTO = new ProdutoDTO(conexao);
-            produtoDTO.save(produto); 
-        } catch (SQLException e) {
-            e.printStackTrace();
-            throw new ServletException("Erro ao salvar produto", e);
-        }
+	            Produto produto = new Produto();
+	            produto.setNome(nome);
+	            produto.setDescricao(descricao);
+	            produto.setQuantidadeEstoque(quantidadeEstoque);
+	            produto.setPreco(preco);
 
-        response.sendRedirect(request.getContextPath() + "/produtos");
-    }
+	            Categoria categoria = new Categoria();
+	            categoria.setId(categoriaId);
+	            produto.setCategoria(categoria);
+
+	            if (idParam != null && !idParam.isEmpty()) {
+	                produto.setId(Integer.parseInt(idParam));
+	                produtoDTO.update(produto); 
+	            } else {
+	                produtoDTO.save(produto);
+	            }
+	        }
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	        throw new ServletException("Erro ao salvar ou excluir produto", e);
+	    }
+
+	    response.sendRedirect(request.getContextPath() + "/produtos");
+	}
 }
